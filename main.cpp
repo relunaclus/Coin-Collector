@@ -30,6 +30,23 @@ int main () {
         Game,
         Shop 
     };
+    // shop
+    int magnetX = SCREEN_WIDTH/5;
+    int magnetY = SCREEN_HEIGHT/5;
+    int magnetScaleX = 50;
+    int magnetScaleY = 50;
+    Color magnetColor = RED;
+    int magBasePrice = 10;
+    int magInflation = 1;
+    int magPrice = magBasePrice * magInflation;
+    int growthX = SCREEN_WIDTH/5*2;
+    int growthY = SCREEN_HEIGHT/5;
+    int growthScaleX = 50;
+    int growthScaleY = 50;
+    Color growthColor = GREEN;
+    int groBasePrice = 20;
+    int groInflation = 1;
+    int groPrice = groBasePrice * groInflation;
 
     GameState state = GameState::Game;
 
@@ -53,6 +70,8 @@ int main () {
     }
         
     string moneyString = to_string((int)playerRad);
+    string magPriceString = to_string(magPrice);
+    string groPriceString = to_string(groPrice);
     
 
     switch (state){
@@ -100,12 +119,41 @@ int main () {
         
     case GameState::Shop:
 
+        if(IsKeyPressed(KEY_ONE) && playerRad >= (magPrice + 1)){
+            magnetism += 1;
+            playerRad -= magPrice;
+            magInflation += 1;
+            magPrice = magBasePrice * magInflation;
+            if(playerRad >= 5){
+                coinRad = playerRad -2;
+            }
+            else{
+                coinRad = 3;
+            }
+        }
+        if(IsKeyPressed(KEY_TWO) && playerRad >= (groPrice +1)){
+            growthSize += 1;
+            playerRad -= groPrice;
+            groInflation += 1;
+            groPrice = groBasePrice + 5* (groInflation*groInflation);
+            if(playerRad >= 5){
+                coinRad = playerRad -2;
+            }
+            else{
+                coinRad = 3;
+            }
+        }
         if(IsKeyPressed(KEY_R)){
             state = GameState::Game;
         }
 
         BeginDrawing();
         ClearBackground(DARKBLUE);
+        DrawRectangle(magnetX, magnetY, magnetScaleX, magnetScaleY, magnetColor);
+        DrawText(magPriceString.c_str(), magnetX+magnetScaleX/2, magnetY+magnetScaleY/2, 50, WHITE);
+        DrawRectangle(growthX, growthY, growthScaleX, growthScaleY, growthColor);
+        DrawText(groPriceString.c_str(), growthX+growthScaleX/2, growthY+growthScaleY/2, 50, WHITE);
+        DrawText(moneyString.c_str(), SCREEN_WIDTH/2-scoreFontSize/2, 0, scoreFontSize, WHITE);
         EndDrawing();
             
         break;

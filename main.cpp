@@ -14,7 +14,8 @@ int main () {
     int playerY = 300;
     int playerSpeedX = 4;
     int playerSpeedY = 4;
-    float playerRad = 5;
+    int points = 5;
+    float playerRad = points + 5;
     int magnetism = 0;
     float effectivePlayerRad = playerRad + magnetism;
     Color playerColor = BROWN;
@@ -55,21 +56,21 @@ int main () {
 
     while (WindowShouldClose() == false){
 
-    // changing player colour based on radius
-    if(playerRad <= 10){
+    // changing player colour based on points
+    if(points <= 10){
         playerColor = BROWN;
     }
-    else if(playerRad <= 20){
+    else if(points <= 20){
         playerColor = ORANGE;
     }
-    else if(playerRad <= 30){
+    else if(points<= 30){
         playerColor = LIGHTGRAY;
     }
     else{
         playerColor = GOLD;
     }
         
-    string moneyString = to_string((int)playerRad);
+    string moneyString = to_string((int)points);
     string magPriceString = to_string(magPrice);
     string groPriceString = to_string(groPrice);
     
@@ -95,8 +96,10 @@ int main () {
         if(CheckCollisionCircles({playerX, playerY}, effectivePlayerRad, {coinX, coinY}, coinRad)){
             coinX = GetRandomValue(0, 800);
             coinY = GetRandomValue(0, 600);
-            playerRad += growthSize;
+            points += growthSize;
             coinRad += growthSize;
+            playerRad = points + 5;
+            effectivePlayerRad = playerRad + magnetism;
         
             // makes coins not spawn too close to the player
             if(CheckCollisionCircles({playerX, playerY}, effectivePlayerRad+playerRange, {coinX, coinY}, coinRad)){
@@ -107,8 +110,9 @@ int main () {
 
         BeginDrawing();
         ClearBackground(DARKBLUE);
+        DrawCircleLines(playerX, playerY, effectivePlayerRad, WHITE);   
         DrawCircle(playerX, playerY, playerRad, playerColor);
-        DrawCircle(coinX, coinY, coinRad, coinColor);    
+        DrawCircle(coinX, coinY, coinRad, coinColor); 
         DrawText(moneyString.c_str(), SCREEN_WIDTH/2-scoreFontSize/2, 0, scoreFontSize, WHITE);
         EndDrawing();
 
@@ -119,11 +123,13 @@ int main () {
         
     case GameState::Shop:
 
-        if(IsKeyPressed(KEY_ONE) && playerRad >= (magPrice + 1)){
-            magnetism += 1;
-            playerRad -= magPrice;
+        if(IsKeyPressed(KEY_ONE) && points >= (magPrice + 1)){
+            magnetism += 10;
+            points -= magPrice;
             magInflation += 1;
             magPrice = magBasePrice * magInflation;
+            playerRad = points + 5;
+            effectivePlayerRad = playerRad + magnetism;
             if(playerRad >= 5){
                 coinRad = playerRad -2;
             }
@@ -131,11 +137,13 @@ int main () {
                 coinRad = 3;
             }
         }
-        if(IsKeyPressed(KEY_TWO) && playerRad >= (groPrice +1)){
+        if(IsKeyPressed(KEY_TWO) && points >= (groPrice +1)){
             growthSize += 1;
-            playerRad -= groPrice;
+            points -= groPrice;
             groInflation += 1;
             groPrice = groBasePrice + 5* (groInflation*groInflation);
+            playerRad = points +5;
+            effectivePlayerRad = playerRad + magnetism;
             if(playerRad >= 5){
                 coinRad = playerRad -2;
             }

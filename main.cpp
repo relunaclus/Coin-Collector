@@ -2,30 +2,33 @@
 #include <raylib.h>
 #include <string.h>
 
-
 using namespace std;
+
+struct Player {
+    int x = 400;
+    int y = 300;
+    int speedX = 4;
+    int speedY = 4;
+    int points = 5;
+    float rad = points + 5;
+    int mag = 0;
+    float effectiveRad = rad + mag;
+    int range = rad/2;
+    Color color = BROWN;
+};
 
 int main () {
 
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
-    // player
-    int playerX = 400;
-    int playerY = 300;
-    int playerSpeedX = 4;
-    int playerSpeedY = 4;
-    int points = 5;
-    float playerRad = points + 5;
-    int magnetism = 0;
-    float effectivePlayerRad = playerRad + magnetism;
-    Color playerColor = BROWN;
+    Player player;
     // coins
     int coinX = GetRandomValue(0, 800);
     int coinY = GetRandomValue(0, 600);
     int coinRad = 3;
     Color coinColor = RED;
     int growthSize = 1;
-    int playerRange = playerRad/2;
+
     int scoreFontSize = 100;
     enum GameState{
         Game,
@@ -57,20 +60,20 @@ int main () {
     while (WindowShouldClose() == false){
 
     // changing player colour based on points
-    if(points <= 10){
-        playerColor = BROWN;
+    if(player.points <= 10){
+        player.color= BROWN;
     }
-    else if(points <= 20){
-        playerColor = ORANGE;
+    else if(player.points <= 20){
+        player.color = ORANGE;
     }
-    else if(points<= 30){
-        playerColor = LIGHTGRAY;
+    else if(player.points<= 30){
+        player.color = LIGHTGRAY;
     }
     else{
-        playerColor = GOLD;
+        player.color = GOLD;
     }
         
-    string moneyString = to_string((int)points);
+    string moneyString = to_string((int)player.points);
     string magPriceString = to_string(magPrice);
     string groPriceString = to_string(groPrice);
     
@@ -79,30 +82,30 @@ int main () {
     case GameState::Game:
     
         // player movement
-        if(IsKeyDown(KEY_W) && playerY > 0){
-            playerY -= playerSpeedY;
+        if(IsKeyDown(KEY_W) && player.y > 0){
+            player.y -= player.speedY;
         }
-        if (IsKeyDown(KEY_S) && playerY < SCREEN_HEIGHT){
-            playerY += playerSpeedY;
+        if (IsKeyDown(KEY_S) && player.y < SCREEN_HEIGHT){
+            player.y += player.speedY;
         }
-        if (IsKeyDown(KEY_A) && playerX > 0){
-            playerX -= playerSpeedX;
+        if (IsKeyDown(KEY_A) && player.x > 0){
+            player.x -= player.speedX;
         }
-        if(IsKeyDown(KEY_D) && playerX < SCREEN_WIDTH){
-            playerX += playerSpeedX;
+        if(IsKeyDown(KEY_D) && player.x < SCREEN_WIDTH){
+            player.x += player.speedX;
         }
 
         // collision
-        if(CheckCollisionCircles({playerX, playerY}, effectivePlayerRad, {coinX, coinY}, coinRad)){
+        if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad, {coinX, coinY}, coinRad)){
             coinX = GetRandomValue(0, 800);
             coinY = GetRandomValue(0, 600);
-            points += growthSize;
+            player.points += growthSize;
             coinRad += growthSize;
-            playerRad = points + 5;
-            effectivePlayerRad = playerRad + magnetism;
+            player.rad = player.points + 5;
+            player.effectiveRad = player.rad + player.mag;
         
             // makes coins not spawn too close to the player
-            if(CheckCollisionCircles({playerX, playerY}, effectivePlayerRad+playerRange, {coinX, coinY}, coinRad)){
+            if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad+player.range, {coinX, coinY}, coinRad)){
                 coinX = GetRandomValue(0, 800);
                 coinY = GetRandomValue(0, 600);
             }
@@ -110,8 +113,8 @@ int main () {
 
         BeginDrawing();
         ClearBackground(DARKBLUE);
-        DrawCircleLines(playerX, playerY, effectivePlayerRad, WHITE);   
-        DrawCircle(playerX, playerY, playerRad, playerColor);
+        DrawCircleLines(player.x, player.y, player.effectiveRad, WHITE);   
+        DrawCircle(player.x, player.y, player.rad, player.color);
         DrawCircle(coinX, coinY, coinRad, coinColor); 
         DrawText(moneyString.c_str(), SCREEN_WIDTH/2-scoreFontSize/2, 0, scoreFontSize, WHITE);
         EndDrawing();
@@ -123,29 +126,29 @@ int main () {
         
     case GameState::Shop:
 
-        if(IsKeyPressed(KEY_ONE) && points >= (magPrice + 1)){
-            magnetism += 10;
-            points -= magPrice;
+        if(IsKeyPressed(KEY_ONE) && player.points >= (magPrice + 1)){
+            player.mag += 10;
+            player.points -= magPrice;
             magInflation += 1;
             magPrice = magBasePrice * magInflation;
-            playerRad = points + 5;
-            effectivePlayerRad = playerRad + magnetism;
-            if(playerRad >= 5){
-                coinRad = playerRad -2;
+            player.rad = player.points + 5;
+            player.effectiveRad = player.rad + player.mag;
+            if(player.rad >= 5){
+                coinRad = player.rad -2;
             }
             else{
                 coinRad = 3;
             }
         }
-        if(IsKeyPressed(KEY_TWO) && points >= (groPrice +1)){
+        if(IsKeyPressed(KEY_TWO) && player.points >= (groPrice +1)){
             growthSize += 1;
-            points -= groPrice;
+            player.points -= groPrice;
             groInflation += 1;
             groPrice = groBasePrice + 5* (groInflation*groInflation);
-            playerRad = points +5;
-            effectivePlayerRad = playerRad + magnetism;
-            if(playerRad >= 5){
-                coinRad = playerRad -2;
+            player.rad = player.points +5;
+            player.effectiveRad = player.rad + player.mag;
+            if(player.rad >= 5){
+                coinRad = player.rad -2;
             }
             else{
                 coinRad = 3;

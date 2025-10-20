@@ -12,9 +12,39 @@ struct Player {
     int points = 5;
     float rad = points + 5;
     int mag = 0;
+    int gro = 1;
     float effectiveRad = rad + mag;
     int range = rad/2;
     Color color = BROWN;
+};
+
+struct Coin{
+    int x = GetRandomValue(0, 800);
+    int y = GetRandomValue(0,600);
+    int rad = 3;
+    Color color = RED;
+};
+
+struct Magnet{
+    int x = 160;
+    int y = 120;
+    int scaleX = 50;
+    int scaleY = 50;
+    Color color = RED;
+    int bPrice = 10;
+    int inflation = 1;
+    int price = bPrice * inflation;
+};
+
+struct Growth{
+    int x = 320;
+    int y = 120;
+    int scaleX = 50;
+    int scaleY = 50;
+    Color color = GREEN;
+    int bPrice = 20;
+    int inflation = 1;
+    int price = bPrice * inflation*inflation;
 };
 
 int main () {
@@ -22,35 +52,16 @@ int main () {
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
     Player player;
-    // coins
-    int coinX = GetRandomValue(0, 800);
-    int coinY = GetRandomValue(0, 600);
-    int coinRad = 3;
-    Color coinColor = RED;
-    int growthSize = 1;
+    Coin coin;
+    Magnet mag;
+    Growth gro;
 
     int scoreFontSize = 100;
+    
     enum GameState{
         Game,
         Shop 
     };
-    // shop
-    int magnetX = SCREEN_WIDTH/5;
-    int magnetY = SCREEN_HEIGHT/5;
-    int magnetScaleX = 50;
-    int magnetScaleY = 50;
-    Color magnetColor = RED;
-    int magBasePrice = 10;
-    int magInflation = 1;
-    int magPrice = magBasePrice * magInflation;
-    int growthX = SCREEN_WIDTH/5*2;
-    int growthY = SCREEN_HEIGHT/5;
-    int growthScaleX = 50;
-    int growthScaleY = 50;
-    Color growthColor = GREEN;
-    int groBasePrice = 20;
-    int groInflation = 1;
-    int groPrice = groBasePrice * groInflation;
 
     GameState state = GameState::Game;
 
@@ -74,8 +85,8 @@ int main () {
     }
         
     string moneyString = to_string((int)player.points);
-    string magPriceString = to_string(magPrice);
-    string groPriceString = to_string(groPrice);
+    string magPriceString = to_string(mag.price);
+    string groPriceString = to_string(gro.price);
     
 
     switch (state){
@@ -96,18 +107,18 @@ int main () {
         }
 
         // collision
-        if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad, {coinX, coinY}, coinRad)){
-            coinX = GetRandomValue(0, 800);
-            coinY = GetRandomValue(0, 600);
-            player.points += growthSize;
-            coinRad += growthSize;
+        if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad, {coin.x, coin.y}, coin.rad)){
+            coin.x = GetRandomValue(0, 800);
+            coin.y = GetRandomValue(0, 600);
+            player.points += player.gro;
+            coin.rad += player.gro;
             player.rad = player.points + 5;
             player.effectiveRad = player.rad + player.mag;
         
             // makes coins not spawn too close to the player
-            if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad+player.range, {coinX, coinY}, coinRad)){
-                coinX = GetRandomValue(0, 800);
-                coinY = GetRandomValue(0, 600);
+            if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad+player.range, {coin.x, coin.y}, coin.rad)){
+                coin.x = GetRandomValue(0, 800);
+                coin.y = GetRandomValue(0, 600);
             }
         }
 
@@ -115,7 +126,7 @@ int main () {
         ClearBackground(DARKBLUE);
         DrawCircleLines(player.x, player.y, player.effectiveRad, WHITE);   
         DrawCircle(player.x, player.y, player.rad, player.color);
-        DrawCircle(coinX, coinY, coinRad, coinColor); 
+        DrawCircle(coin.x, coin.y, coin.rad, coin.color); 
         DrawText(moneyString.c_str(), SCREEN_WIDTH/2-scoreFontSize/2, 0, scoreFontSize, WHITE);
         EndDrawing();
 
@@ -126,32 +137,32 @@ int main () {
         
     case GameState::Shop:
 
-        if(IsKeyPressed(KEY_ONE) && player.points >= (magPrice + 1)){
+        if(IsKeyPressed(KEY_ONE) && player.points >= (mag.price + 1)){
             player.mag += 10;
-            player.points -= magPrice;
-            magInflation += 1;
-            magPrice = magBasePrice * magInflation;
+            player.points -= mag.price;
+            mag.inflation += 1;
+            mag.price = mag.bPrice * mag.inflation;
             player.rad = player.points + 5;
             player.effectiveRad = player.rad + player.mag;
             if(player.rad >= 5){
-                coinRad = player.rad -2;
+                coin.rad = player.rad -2;
             }
             else{
-                coinRad = 3;
+                coin.rad = 3;
             }
         }
-        if(IsKeyPressed(KEY_TWO) && player.points >= (groPrice +1)){
-            growthSize += 1;
+        if(IsKeyPressed(KEY_TWO) && player.points >= (gro.price +1)){
+            player.gro += 1;
             player.points -= groPrice;
-            groInflation += 1;
-            groPrice = groBasePrice + 5* (groInflation*groInflation);
+            gro.inflation += 1;
+            gro.price = gro.bPrice * gro.inflation * gro.inflation;
             player.rad = player.points +5;
             player.effectiveRad = player.rad + player.mag;
             if(player.rad >= 5){
-                coinRad = player.rad -2;
+                coin.rad = player.rad -2;
             }
             else{
-                coinRad = 3;
+                coin.rad = 3;
             }
         }
         if(IsKeyPressed(KEY_R)){
@@ -160,10 +171,10 @@ int main () {
 
         BeginDrawing();
         ClearBackground(DARKBLUE);
-        DrawRectangle(magnetX, magnetY, magnetScaleX, magnetScaleY, magnetColor);
-        DrawText(magPriceString.c_str(), magnetX+magnetScaleX/2, magnetY+magnetScaleY/2, 50, WHITE);
-        DrawRectangle(growthX, growthY, growthScaleX, growthScaleY, growthColor);
-        DrawText(groPriceString.c_str(), growthX+growthScaleX/2, growthY+growthScaleY/2, 50, WHITE);
+        DrawRectangle(mag.x, mag.y, mag.scaleX, mag.scaleY, mag.color);
+        DrawText(magPriceString.c_str(), mag.x+mag.scaleX/2, mag.y+mag.scaleY/2, 50, WHITE);
+        DrawRectangle(gro.x, gro.y, gro.scaleX, gro.scaleY, gro.color);
+        DrawText(groPriceString.c_str(), gro.x+gro.scaleX/2, gro.y+gro.scaleY/2, 50, WHITE);
         DrawText(moneyString.c_str(), SCREEN_WIDTH/2-scoreFontSize/2, 0, scoreFontSize, WHITE);
         EndDrawing();
             

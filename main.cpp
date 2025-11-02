@@ -1,50 +1,16 @@
 #include <iostream>
 #include <raylib.h>
 #include <string.h>
+#include <player.hpp>
+#include <upgrades.hpp>
 
 using namespace std;
-
-struct Player {
-    int x = 400;
-    int y = 300;
-    int speedX = 4;
-    int speedY = 4;
-    int points = 5;
-    float rad = points + 5;
-    int mag = 0;
-    int gro = 1;
-    float effectiveRad = rad + mag;
-    int range = rad/2;
-    Color color = BROWN;
-};
 
 struct Coin{
     int x = GetRandomValue(0, 800);
     int y = GetRandomValue(0,600);
     int rad = 3;
     Color color = RED;
-};
-
-struct Magnet{
-    int x = 160;
-    int y = 120;
-    int scaleX = 50;
-    int scaleY = 50;
-    Color color = RED;
-    int bPrice = 10;
-    int inflation = 1;
-    int price = bPrice * inflation;
-};
-
-struct Growth{
-    int x = 320;
-    int y = 120;
-    int scaleX = 50;
-    int scaleY = 50;
-    Color color = GREEN;
-    int bPrice = 20;
-    int inflation = 1;
-    int price = bPrice * inflation*inflation;
 };
 
 int main () {
@@ -55,6 +21,7 @@ int main () {
     Coin coin;
     Magnet mag;
     Growth gro;
+    Speed spd;
 
     int scoreFontSize = 100;
     
@@ -87,6 +54,7 @@ int main () {
     string moneyString = to_string((int)player.points);
     string magPriceString = to_string(mag.price);
     string groPriceString = to_string(gro.price);
+    string spdPriceString = to_string(spd.price);
     
 
     switch (state){
@@ -153,7 +121,7 @@ int main () {
         }
         if(IsKeyPressed(KEY_TWO) && player.points >= (gro.price +1)){
             player.gro += 1;
-            player.points -= groPrice;
+            player.points -= gro.price;
             gro.inflation += 1;
             gro.price = gro.bPrice * gro.inflation * gro.inflation;
             player.rad = player.points +5;
@@ -165,6 +133,22 @@ int main () {
                 coin.rad = 3;
             }
         }
+        if(IsKeyPressed(KEY_THREE) && player.points >= (spd.price +1)){
+            player.speedX += 1;
+            player.speedY += 1;
+            player.points -= spd.price;
+            spd.inflation += 1;
+            spd.price = spd.bPrice * spd.inflation * spd.inflation;
+            player.rad = player.points +5;
+            player.effectiveRad = player.rad + player.mag;
+            if(player.rad >= 5){
+                coin.rad = player.rad -2;
+            }
+            else{
+                coin.rad = 3;
+            }
+            
+        }
         if(IsKeyPressed(KEY_R)){
             state = GameState::Game;
         }
@@ -175,9 +159,11 @@ int main () {
         DrawText(magPriceString.c_str(), mag.x+mag.scaleX/2, mag.y+mag.scaleY/2, 50, WHITE);
         DrawRectangle(gro.x, gro.y, gro.scaleX, gro.scaleY, gro.color);
         DrawText(groPriceString.c_str(), gro.x+gro.scaleX/2, gro.y+gro.scaleY/2, 50, WHITE);
+        DrawRectangle(spd.x, spd.y, spd.scaleX, spd.scaleY, spd.color);
+        DrawText(spdPriceString.c_str(), spd.x+spd.scaleX/2, spd.y + spd.scaleY/2, 50, WHITE);
         DrawText(moneyString.c_str(), SCREEN_WIDTH/2-scoreFontSize/2, 0, scoreFontSize, WHITE);
         EndDrawing();
-            
+    
         break;
     
     default:

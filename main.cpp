@@ -15,6 +15,7 @@ struct Coin{
 
 int main () {
 
+
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
     Player player;
@@ -22,7 +23,6 @@ int main () {
     Magnet mag;
     Growth gro;
     Speed spd;
-
     int scoreFontSize = 100;
     
     enum GameState{
@@ -35,8 +35,13 @@ int main () {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Coin Collector");
     SetTargetFPS(60);
 
-    while (WindowShouldClose() == false){
+    InitAudioDevice();
 
+    Sound getCoin =  LoadSound("Sound Effects / getCoin.wav");
+
+    while (WindowShouldClose() == false){
+    PlaySound(getCoin);
+    
     // changing player colour based on points
     if(player.points <= 10){
         player.color= BROWN;
@@ -82,6 +87,9 @@ int main () {
             coin.rad += player.gro;
             player.rad = player.points + 5;
             player.effectiveRad = player.rad + player.mag;
+
+            SetSoundVolume(getCoin, 1);
+            PlaySound(getCoin);
         
             // makes coins not spawn too close to the player
             if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad+player.range, {coin.x, coin.y}, coin.rad)){

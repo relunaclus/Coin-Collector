@@ -37,11 +37,13 @@ int main () {
 
     InitAudioDevice();
 
-    Sound getCoin =  LoadSound("Sound Effects / getCoin.wav");
+    Sound getCoin =  LoadSound("getCoin.wav"); 
+    Sound getUpgrade = LoadSound("getUpgrade.wav");
+
+    Texture2D magTex = LoadTexture("Magnet.png");
 
     while (WindowShouldClose() == false){
-    PlaySound(getCoin);
-    
+
     // changing player colour based on points
     if(player.points <= 10){
         player.color= BROWN;
@@ -87,14 +89,13 @@ int main () {
             coin.rad += player.gro;
             player.rad = player.points + 5;
             player.effectiveRad = player.rad + player.mag;
-
             SetSoundVolume(getCoin, 1);
             PlaySound(getCoin);
         
             // makes coins not spawn too close to the player
             if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad+player.range, {coin.x, coin.y}, coin.rad)){
-                coin.x = GetRandomValue(0, 800);
-                coin.y = GetRandomValue(0, 600);
+                coin.x = GetRandomValue(0, SCREEN_WIDTH);
+                coin.y = GetRandomValue(0, SCREEN_HEIGHT);
             }
         }
 
@@ -126,6 +127,7 @@ int main () {
             else{
                 coin.rad = 3;
             }
+            PlaySound(getUpgrade);
         }
         if(IsKeyPressed(KEY_TWO) && player.points >= (gro.price +1)){
             player.gro += 1;
@@ -140,6 +142,7 @@ int main () {
             else{
                 coin.rad = 3;
             }
+            PlaySound(getUpgrade);
         }
         if(IsKeyPressed(KEY_THREE) && player.points >= (spd.price +1)){
             player.speedX += 1;
@@ -155,6 +158,7 @@ int main () {
             else{
                 coin.rad = 3;
             }
+            PlaySound(getUpgrade);
             
         }
         if(IsKeyPressed(KEY_R)){
@@ -163,7 +167,7 @@ int main () {
 
         BeginDrawing();
         ClearBackground(DARKBLUE);
-        DrawRectangle(mag.x, mag.y, mag.scaleX, mag.scaleY, mag.color);
+        DrawTexture(magTex, mag.x, mag.y, RAYWHITE);
         DrawText(magPriceString.c_str(), mag.x+mag.scaleX/2, mag.y+mag.scaleY/2, 50, WHITE);
         DrawRectangle(gro.x, gro.y, gro.scaleX, gro.scaleY, gro.color);
         DrawText(groPriceString.c_str(), gro.x+gro.scaleX/2, gro.y+gro.scaleY/2, 50, WHITE);

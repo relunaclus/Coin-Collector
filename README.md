@@ -9,7 +9,7 @@ Date: 05/12/2025
 
 ### Project Outline
 
-Coin Collector is a simple top down 2D idle style game with simplistic graphics that takes inspiration from many .io style games, most notably "Agar.io."
+Coin Collector is a simple top down 2D idle style game with simplistic graphics that takes inspiration from many .io style games and other idle games, most notably "Agar.io."
 It fits the theme "pocket" as the player controls a coin with the goal of collecting more coins, inspired by the concept of losing change in a pocket. As the player collects coins, new coins will spawn and the player will increase in size. Additionally, the score above the player will increase, this score can be used in order to buy upgrades which let the player increase point generation even further.
 
 ![A gif of Coin Collector being played](/Assets/README%20Assets/demogif.gif "Coin Collector")
@@ -24,6 +24,8 @@ It fits the theme "pocket" as the player controls a coin with the goal of collec
 #### Game Sources
 
 - games you have researched
+
+A game that Coin Collector takes major influence from is Agar.io, an .io style game where players compete 
 - use zotero
 
 #### Academic Sources

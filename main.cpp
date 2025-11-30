@@ -11,10 +11,12 @@ struct Coin{
     int y = GetRandomValue(0,600);
     int rad = 3;
     Color color = RED;
+    int particleX = x;
+    int particleY = y;
+    int particleRad = rad/2;
 };
 
 int main () {
-
 
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
@@ -25,6 +27,8 @@ int main () {
     Speed spd;
     int scoreFontSize = 100;
     
+    Color playercolors[4] = {BROWN, ORANGE, LIGHTGRAY, GOLD};
+
     enum GameState{
         Game,
         Shop 
@@ -39,23 +43,25 @@ int main () {
 
     Sound getCoin =  LoadSound("getCoin.wav"); 
     Sound getUpgrade = LoadSound("getUpgrade.wav");
-
     Texture2D magTex = LoadTexture("Magnet.png");
+    Texture2D groTex = LoadTexture("Growth.png");
+    Texture2D spdTex = LoadTexture("Speed.png");
 
     while (WindowShouldClose() == false){
 
     // changing player colour based on points
+
     if(player.points <= 10){
-        player.color= BROWN;
+    player.color = playercolors[0];
     }
     else if(player.points <= 20){
-        player.color = ORANGE;
+    player.color = playercolors[1];
     }
     else if(player.points<= 30){
-        player.color = LIGHTGRAY;
+    player.color = playercolors[2];
     }
     else{
-        player.color = GOLD;
+     player.color = playercolors[3];
     }
         
     string moneyString = to_string((int)player.points);
@@ -99,6 +105,9 @@ int main () {
             }
         }
 
+        // coins emit particles
+
+
         BeginDrawing();
         ClearBackground(DARKBLUE);
         DrawCircleLines(player.x, player.y, player.effectiveRad, WHITE);   
@@ -113,6 +122,29 @@ int main () {
         break;
         
     case GameState::Shop:
+
+    if(player.points >= (mag.price +1)){
+        mag.color = RAYWHITE;
+    }
+    else{
+        mag.color = GRAY;
+        }
+
+    if(player.points >= (gro.price +1)){
+        gro.color = RAYWHITE;
+    }
+    else{
+        gro.color = GRAY;
+    }
+
+    if(player.points >= (spd.price +1)){
+        spd.color = RAYWHITE;
+    }
+    else{
+        spd.color = GRAY;
+    }
+
+
 
         if(IsKeyPressed(KEY_ONE) && player.points >= (mag.price + 1)){
             player.mag += 10;
@@ -167,11 +199,11 @@ int main () {
 
         BeginDrawing();
         ClearBackground(DARKBLUE);
-        DrawTexture(magTex, mag.x, mag.y, RAYWHITE);
+        DrawTexture(magTex, mag.x, mag.y, mag.color);
         DrawText(magPriceString.c_str(), mag.x+mag.scaleX/2, mag.y+mag.scaleY/2, 50, WHITE);
-        DrawRectangle(gro.x, gro.y, gro.scaleX, gro.scaleY, gro.color);
+        DrawTexture(groTex, gro.x, gro.y, gro.color);   
         DrawText(groPriceString.c_str(), gro.x+gro.scaleX/2, gro.y+gro.scaleY/2, 50, WHITE);
-        DrawRectangle(spd.x, spd.y, spd.scaleX, spd.scaleY, spd.color);
+        DrawTexture(spdTex, spd.x, spd.y, spd.color);
         DrawText(spdPriceString.c_str(), spd.x+spd.scaleX/2, spd.y + spd.scaleY/2, 50, WHITE);
         DrawText(moneyString.c_str(), SCREEN_WIDTH/2-scoreFontSize/2, 0, scoreFontSize, WHITE);
         EndDrawing();

@@ -3,6 +3,9 @@
 #include <string.h>
 #include <player.hpp>
 #include <upgrades.hpp>
+#include <json-develop/single_include/nlohmann/json.hpp>
+#include <fstream>
+#include <memory.hpp>
 
 using namespace std;
 
@@ -46,11 +49,18 @@ int main () {
     Texture2D magTex = LoadTexture("Magnet.png");
     Texture2D groTex = LoadTexture("Growth.png");
     Texture2D spdTex = LoadTexture("Speed.png");
+    bool hasGameStarted = false;
+
+    if (!hasGameStarted) {
+                    json data = JSON::loadData();
+
+                    player.points = data["Score"];
+                    hasGameStarted = true;
+                }
 
     while (WindowShouldClose() == false){
 
     // changing player colour based on points
-
     if(player.points <= 10){
     player.color = playercolors[0];
     }
@@ -216,5 +226,11 @@ int main () {
             
     }
 }
+UnloadSound(getCoin);
+UnloadSound(getUpgrade);
+UnloadTexture(magTex);
+UnloadTexture(groTex);
+UnloadTexture(spdTex);
+JSON::AmendScoreJson(player.points);
     CloseWindow();
 }

@@ -99,8 +99,8 @@ int main () {
 
         // collision
         if(CheckCollisionCircles({player.x, player.y}, player.effectiveRad, {coin.x, coin.y}, coin.rad)){
-            coin.x = GetRandomValue(0, 800);
-            coin.y = GetRandomValue(0, 600);
+            coin.x = GetRandomValue(0, SCREEN_WIDTH);
+            coin.y = GetRandomValue(0, SCREEN_HEIGHT));
             player.points += player.gro;
             coin.rad += player.gro;
             player.rad = player.points + 5;
@@ -114,9 +114,6 @@ int main () {
                 coin.y = GetRandomValue(0, SCREEN_HEIGHT);
             }
         }
-
-        // coins emit particles
-
 
         BeginDrawing();
         ClearBackground(DARKBLUE);
